@@ -44,7 +44,7 @@ public class PessimisticTest extends TestCase {
 
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
         for(int i = 0;i<THREAD_COUNT;i++) {
-            executor.submit(new PaymentJob(i,customerId, LockModeType.PESSIMISTIC_WRITE));
+            executor.submit(new PaymentJob(20l,20l,i,customerId, LockModeType.PESSIMISTIC_WRITE));
         }
         executor.shutdown();
         try {
@@ -70,7 +70,7 @@ public class PessimisticTest extends TestCase {
 
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
         for(int i = 0;i<THREAD_COUNT;i++) {
-            executor.submit(new PaymentJob(i,customerId, LockModeType.PESSIMISTIC_READ));
+            executor.submit(new PaymentJob(20l,20l,i,customerId, LockModeType.PESSIMISTIC_READ));
         }
         executor.shutdown();
         try {

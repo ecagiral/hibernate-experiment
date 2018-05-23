@@ -7,10 +7,10 @@ import junit.framework.TestCase;
 import org.hibernate.Session;
 
 import javax.persistence.LockModeType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,13 +39,15 @@ public class NoneTest extends TestCase {
         session.close();
     }
 
-    public void testNone()
-    {
-        LOG.info("None Lock -> only last thread updates the entity");
-
+    /**
+     * Multiple sessions updates data at the same time without knowing each other
+     * So result is same for all
+     */
+    public void testNone(){
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        List<Future<Integer>> futureList = new ArrayList<Future<Integer>>();
         for(int i = 0;i<threadCount;i++) {
-            executor.submit(new PaymentJob(i,customerId, LockModeType.NONE));
+            futureList.add(executor.submit(new PaymentJob(20l,20l,i,customerId, LockModeType.NONE)));
         }
         executor.shutdown();
         try {
@@ -57,10 +59,14 @@ public class NoneTest extends TestCase {
             e.printStackTrace();
         }
 
-        Session session2 = repo.getSession();
-        session2.beginTransaction();
-        assertEquals(1, session2.find(Customer.class,customerId).getPayment().intValue());
-        session2.getTransaction().commit();
-        session2.close();
+        for(Future<Integer> aFuture:futureList){
+            try {
+                assertEquals(1,aFuture.get().intValue());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
