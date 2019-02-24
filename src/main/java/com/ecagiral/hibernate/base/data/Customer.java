@@ -1,9 +1,8 @@
 package com.ecagiral.hibernate.base.data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Customer {
@@ -19,9 +18,8 @@ public class Customer {
     @Version
     private Integer version;
 
-    public Customer(){
+    public Customer(){}
 
-    }
     public Customer(String name){
         this.name = name;
         this.payment = 0;
@@ -39,7 +37,6 @@ public class Customer {
         this.name = name;
     }
 
-
     public void makePayment(int amount) {
         this.payment = this.payment + amount;
     }
@@ -47,4 +44,7 @@ public class Customer {
     public Integer getPayment(){
         return payment;
     }
+
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "buyer")
+    public List<Sale> sales = new ArrayList<>();
 }

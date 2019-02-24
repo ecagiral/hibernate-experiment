@@ -13,9 +13,11 @@
         <property name="dialect">org.hibernate.dialect.PostgreSQL94Dialect</property> <!-- DB Dialect -->
         <property name="hbm2ddl.auto">create</property> <!-- create / create-drop / update -->
 
-        <property name="show_sql">false</property> <!-- Show SQL in console -->
+        <property name="show_sql">true</property> <!-- Show SQL in console -->
         <property name="format_sql">true</property> <!-- Show SQL formatted -->
 
         <mapping class="com.ecagiral.hibernate.base.data.Customer"/>
+        <mapping class="com.ecagiral.hibernate.base.data.Sale"/>
+
     </session-factory>
 </hibernate-configuration>

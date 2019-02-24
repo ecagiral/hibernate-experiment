@@ -1,4 +1,4 @@
-package com.ecagiral.hibernate;
+package com.ecagiral.hibernate.lock;
 
 import com.ecagiral.hibernate.base.Repo;
 import com.ecagiral.hibernate.base.data.Customer;
