@@ -14,7 +14,11 @@ import static junit.framework.Assert.assertEquals;
 public class OrphanTest {
 
 
-    public void test_OrphanRemovalWithoutFlush(){
+    /**
+     * Hibernate is unable to remove orphan
+     * if added and removed to the parent's list in the same session
+     */
+    public void test_OrphanRemoval(){
 
         Session session = Repo.getInstance().getSession();
         session.beginTransaction();
@@ -24,8 +28,7 @@ public class OrphanTest {
         customer.sales.add(sale);
         session.save(customer);
 
-        customer.sales.clear();
-        session.save(customer);
+        customer.sales.remove(sale);
 
         List<Sale> sales = session
                 .createQuery("select s from Sale s where s.buyer = :buyer",Sale.class)
@@ -36,9 +39,44 @@ public class OrphanTest {
         session.getTransaction().commit();
         session.close();
 
-        assertEquals(1,size);
+        assertEquals("Sales count",1,size);
     }
 
+    /**
+     * Hibernate is able to remove orphan
+     * if added to the parent's list
+     * but removed via setting child's parent null
+     */
+    public void test_OrphanRemovalSetParentNull(){
+
+        Session session = Repo.getInstance().getSession();
+        session.beginTransaction();
+
+        Customer customer = new Customer(UUID.randomUUID().toString());
+        Sale sale = new Sale(customer,BigDecimal.TEN);
+        customer.sales.add(sale);
+        session.save(customer);
+
+        sale.setBuyer(null);
+
+        List<Sale> sales = session
+                .createQuery("select s from Sale s where s.buyer = :buyer",Sale.class)
+                .setParameter("buyer",customer)
+                .getResultList();
+        int size = sales.size();
+
+        session.getTransaction().commit();
+        session.close();
+
+        assertEquals("Sales count",0,size);
+    }
+
+    /**
+     * Hibernate is able to remove orphan
+     * if added to the parent's list
+     * flush called
+     * and removed from the parent's list
+     */
     public void test_OrphanRemovalWithFlush(){
 
         Session session = Repo.getInstance().getSession();
