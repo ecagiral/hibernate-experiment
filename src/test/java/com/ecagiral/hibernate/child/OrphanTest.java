@@ -9,15 +9,18 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import org.junit.Test;
+
 import static junit.framework.Assert.assertEquals;
 
 public class OrphanTest {
 
 
     /**
-     * Hibernate is unable to remove orphan
-     * if added and removed to the parent's list in the same session
+     * Hibernate 7 correctly removes the orphan
+     * even when added and removed in the same session (behavior changed from Hibernate 5)
      */
+    @Test
     public void test_OrphanRemoval(){
 
         Session session = Repo.getInstance().getSession();
@@ -26,7 +29,7 @@ public class OrphanTest {
         Customer customer = new Customer(UUID.randomUUID().toString());
         Sale sale = new Sale(customer,BigDecimal.TEN);
         customer.sales.add(sale);
-        session.save(customer);
+        session.persist(customer);
 
         customer.sales.remove(sale);
 
@@ -39,7 +42,7 @@ public class OrphanTest {
         session.getTransaction().commit();
         session.close();
 
-        assertEquals("Sales count",1,size);
+        assertEquals("Sales count",0,size);
     }
 
     /**
@@ -47,6 +50,7 @@ public class OrphanTest {
      * if added to the parent's list
      * but removed via setting child's parent null
      */
+    @Test
     public void test_OrphanRemovalSetParentNull(){
 
         Session session = Repo.getInstance().getSession();
@@ -55,7 +59,7 @@ public class OrphanTest {
         Customer customer = new Customer(UUID.randomUUID().toString());
         Sale sale = new Sale(customer,BigDecimal.TEN);
         customer.sales.add(sale);
-        session.save(customer);
+        session.persist(customer);
 
         sale.setBuyer(null);
 
@@ -77,6 +81,7 @@ public class OrphanTest {
      * flush called
      * and removed from the parent's list
      */
+    @Test
     public void test_OrphanRemovalWithFlush(){
 
         Session session = Repo.getInstance().getSession();
@@ -85,12 +90,11 @@ public class OrphanTest {
         Customer customer = new Customer(UUID.randomUUID().toString());
         Sale sale = new Sale(customer,BigDecimal.TEN);
         customer.sales.add(sale);
-        session.save(customer);
+        session.persist(customer);
 
         session.flush();
 
         customer.sales.clear();
-        session.save(customer);
 
         List<Sale> sales = session
                 .createQuery("select s from Sale s where s.buyer = :buyer",Sale.class)
@@ -104,6 +108,7 @@ public class OrphanTest {
         assertEquals(0,size);
     }
 
+    @Test
     public void test_ChildCreation(){
 
         Session session = Repo.getInstance().getSession();
@@ -112,11 +117,10 @@ public class OrphanTest {
         Customer customer = new Customer(UUID.randomUUID().toString());
         Sale sale = new Sale(customer,BigDecimal.TEN);
         customer.sales.add(sale);
-        session.save(customer);
+        session.persist(customer);
 
         Sale sale2 = new Sale(customer,BigDecimal.ONE);
         customer.sales.add(sale2);
-        session.save(customer);
 
         List<Sale> sales = session
                 .createQuery("select s from Sale s where s.buyer = :buyer",Sale.class)

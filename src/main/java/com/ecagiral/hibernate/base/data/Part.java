@@ -1,6 +1,6 @@
 package com.ecagiral.hibernate.base.data;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class Part {

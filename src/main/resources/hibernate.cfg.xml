@@ -10,7 +10,7 @@
         <property name="connection.username">ecagiral</property> <!-- DB User -->
         <property name="connection.password">12345</property> <!-- DB Password -->
 
-        <property name="dialect">org.hibernate.dialect.PostgreSQL94Dialect</property> <!-- DB Dialect -->
+        <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property> <!-- DB Dialect -->
         <property name="hbm2ddl.auto">create</property> <!-- create / create-drop / update -->
 
         <property name="show_sql">false</property> <!-- Show SQL in console -->

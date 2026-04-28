@@ -25,9 +25,9 @@ public class AssociationTest extends TestCase {
         Session session = repo.getSession();
         session.beginTransaction();
         Customer customer = new Customer(UUID.randomUUID().toString());
-        session.save(customer);
+        session.persist(customer);
         Sale sale = new Sale(customer, BigDecimal.TEN);
-        session.save(sale);
+        session.persist(sale);
         saleId = sale.getId();
         session.getTransaction().commit();
         session.close();

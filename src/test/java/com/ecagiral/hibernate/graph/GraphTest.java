@@ -5,15 +5,17 @@ import com.ecagiral.hibernate.base.data.Part;
 import com.ecagiral.hibernate.base.data.Product;
 import com.ecagiral.hibernate.base.data.ProductRef;
 import org.hibernate.Session;
-import org.hibernate.transform.Transformers;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
 public class GraphTest {
 
+    @Test
     public void test_retrieve_lazy(){
 
         Session session = Repo.getInstance().getSession();
@@ -21,7 +23,7 @@ public class GraphTest {
 
         Product topProduct = getProduct();
 
-        session.save(topProduct);
+        session.persist(topProduct);
 
         List<Integer> productList = new ArrayList<>();
         productList.add(topProduct.getId());
@@ -72,6 +74,7 @@ public class GraphTest {
         return topProduct;
     }
 
+    @Test
     public void test_retrieve_graph(){
 
         Session session = Repo.getInstance().getSession();
@@ -79,7 +82,7 @@ public class GraphTest {
 
         Product topProduct = getProduct();
 
-        session.save(topProduct);
+        session.persist(topProduct);
 
         List<Integer> productList = new ArrayList<>();
         productList.add(topProduct.getId());
@@ -90,6 +93,7 @@ public class GraphTest {
         session.beginTransaction();
 
         long start = System.currentTimeMillis();
+        @SuppressWarnings("unchecked")
         List<ProductRef> products = session
                 .createNativeQuery("WITH RECURSIVE all_bom(id,name,timesused,child_id) AS ( " +
                         "    SELECT p.id,p.name,pp.timesused,pp.child_id " +
@@ -103,8 +107,13 @@ public class GraphTest {
                         "    join part pp on pp.parent_id = p.id " +
                         ") " +
                         "select * from all_bom")
-                .setResultTransformer(Transformers.aliasToBean(ProductRef.class))
-                .setParameter("id",productList)
+                .addScalar("id", Integer.class)
+                .addScalar("name", String.class)
+                .addScalar("timesused", Integer.class)
+                .addScalar("child_id", Integer.class)
+                .setTupleTransformer((tuple, aliases) ->
+                        new ProductRef((Integer) tuple[0], (String) tuple[1], (Integer) tuple[2], (Integer) tuple[3]))
+                .setParameter("id", productList)
                 .getResultList();
 
         session.getTransaction().commit();
