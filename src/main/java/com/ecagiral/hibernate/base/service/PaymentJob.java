@@ -3,7 +3,7 @@ package com.ecagiral.hibernate.base.service;
 
 import com.ecagiral.hibernate.base.data.Customer;
 
-import javax.persistence.LockModeType;
+import jakarta.persistence.LockModeType;
 
 public class PaymentJob extends BaseJob{
 
@@ -19,7 +19,6 @@ public class PaymentJob extends BaseJob{
     public Integer execute() throws Exception {
         Customer customer = session.find(Customer.class,customerId, lockType);
         customer.makePayment(1);
-        session.update(customer);
         return customer.getPayment();
     }
 }

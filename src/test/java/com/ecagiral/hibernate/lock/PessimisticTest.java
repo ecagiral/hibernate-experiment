@@ -6,7 +6,7 @@ import com.ecagiral.hibernate.base.service.PaymentJob;
 import junit.framework.TestCase;
 import org.hibernate.Session;
 
-import javax.persistence.LockModeType;
+import jakarta.persistence.LockModeType;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,7 +31,7 @@ public class PessimisticTest extends TestCase {
         session.beginTransaction();
 
         Customer customer = new Customer(UUID.randomUUID().toString());
-        session.save(customer);
+        session.persist(customer);
         customerId = customer.getId();
 
         session.getTransaction().commit();

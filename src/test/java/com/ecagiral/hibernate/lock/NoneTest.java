@@ -6,7 +6,7 @@ import com.ecagiral.hibernate.base.service.PaymentJob;
 import junit.framework.TestCase;
 import org.hibernate.Session;
 
-import javax.persistence.LockModeType;
+import jakarta.persistence.LockModeType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +32,7 @@ public class NoneTest extends TestCase {
         session.beginTransaction();
 
         Customer customer = new Customer(UUID.randomUUID().toString());
-        session.save(customer);
+        session.persist(customer);
         customerId = customer.getId();
 
         session.getTransaction().commit();

@@ -2,7 +2,7 @@ package com.ecagiral.hibernate.base.service;
 
 import com.ecagiral.hibernate.base.data.Customer;
 
-import javax.persistence.LockModeType;
+import jakarta.persistence.LockModeType;
 
 
 public class ReportJob extends BaseJob{
